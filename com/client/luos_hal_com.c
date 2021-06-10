@@ -105,7 +105,7 @@ void LuosHAL_SetRxState(uint8_t Enable)
 uint8_t LuosHAL_ComTransmit(uint8_t *data, uint16_t size)
 {
     #ifdef DEBUG
-    NRF_LOG_INFO("Sending %u bytes!", size);
+    NRF_LOG_INFO("Prepare %u bytes for sending!", size);
     NRF_LOG_HEXDUMP_INFO(data, size);
     #endif /* DEBUG */
 
@@ -297,9 +297,15 @@ static void LuosHAL_ComClientEventHandler(ble_nus_c_t* instance,
             s_curr_rx_byte = event->p_data[rx_byte_idx];
             LUOS_COM_IRQHANDLER();
         }
-        if (len < BLE_NUS_MAX_DATA_LEN - 1)
+        if (len == 1) // Ack
         {
+            // Manage Ack: reset recep callback and pop TX task.
             Recep_Timeout();
+        }
+        else if (len < BLE_NUS_MAX_DATA_LEN - 1)
+        {
+            // Complete message: no need to wait for the rest.
+            Recep_Reset();
         }
         else
         {

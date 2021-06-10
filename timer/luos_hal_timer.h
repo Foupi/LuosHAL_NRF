@@ -2,7 +2,7 @@
 #define LUOS_HAL_TIMER_H
 
 // Default timeout value in milliseconds.
-#define DEFAULT_TIMEOUT 200
+#define DEFAULT_TIMEOUT 100
 
 void LuosHAL_TimeoutInit(void);
 

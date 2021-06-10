@@ -279,9 +279,15 @@ static void LuosHAL_ComServerEventHandler(ble_nus_evt_t* event)
             s_curr_rx_byte = rx_data.p_data[rx_byte_idx];
             LUOS_COM_IRQHANDLER();
         }
-        if (len < BLE_NUS_MAX_DATA_LEN - 1)
+        if (len == 1) // Ack
         {
+            // Manage Ack: reset recep callback and pop TX task.
             Recep_Timeout();
+        }
+        else if (len < BLE_NUS_MAX_DATA_LEN - 1)
+        {
+            // Complete message: no need to wait for the rest.
+            Recep_Reset();
         }
         else
         {
